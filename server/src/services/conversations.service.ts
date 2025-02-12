@@ -29,6 +29,9 @@ class ConversationsService {
             throw error;
         }
 
+        const agent = JSON.parse(JSON.stringify(metadataConversation.agent));
+        const timeDelay = agent.inverseTimeDelay
+
         const messages: any[] = this.getConversationMessages(metadataConversation.agent, conversation, message);
         const chatRequest = this.getChatRequest(metadataConversation.agent, messages);
         await this.createMessageDoc(message, conversationId, conversation.length + 1);
@@ -58,6 +61,7 @@ class ConversationsService {
             {
                 content: assistantMessage,
                 role: 'assistant',
+                timeDelay: timeDelay,
             },
             conversationId,
             conversation.length + 2,
@@ -103,6 +107,7 @@ class ConversationsService {
         const firstMessage: Message = {
             role: 'assistant',
             content: user.isAdmin ? agent.firstChatSentence : user.agent.firstChatSentence,
+            timeDelay: null,
         };
         await Promise.all([
             this.createMessageDoc(firstMessage, res._id.toString(), 1),
@@ -115,8 +120,8 @@ class ConversationsService {
 
     getConversation = async (conversationId: string, isLean = false): Promise<Message[]> => {
         const returnValues = isLean
-            ? { _id: 0, role: 1, content: 1 }
-            : { _id: 1, role: 1, content: 1, userAnnotation: 1 };
+            ? { _id: 0, role: 1, content: 1, timeDelay: 1 }
+            : { _id: 1, role: 1, content: 1, timeDelay: 1, userAnnotation: 1 };
 
         const conversation = await ConversationsModel.find({ conversationId }, returnValues);
 
@@ -197,6 +202,7 @@ class ConversationsService {
         const systemPrompt = { role: 'system', content: agent.systemStarterPrompt };
         const beforeUserMessage = { role: 'system', content: agent.beforeUserSentencePrompt };
         const afterUserMessage = { role: 'system', content: agent.afterUserSentencePrompt };
+        const inverseTimeDelay = { role: 'system', content: agent.inverseTimeDelay };
 
         const messages = [
             systemPrompt,
@@ -204,7 +210,7 @@ class ConversationsService {
             beforeUserMessage,
             message,
             afterUserMessage,
-            { role: 'assistant', content: '' },
+            { role: 'assistant', content: '', timeDelay: inverseTimeDelay },
         ];
 
         return messages;
@@ -220,9 +226,10 @@ class ConversationsService {
             role: message.role,
             conversationId,
             messageNumber,
+            timeDelay: message.timeDelay,
         });
 
-        return { _id: res._id, role: res.role, content: res.content, userAnnotation: res.userAnnotation };
+        return { _id: res._id, role: res.role, content: res.content, userAnnotation: res.userAnnotation, timeDelay: res.timeDelay };
     };
 
     private getChatRequest = (agent: IAgent, messages: Message[]) => {
