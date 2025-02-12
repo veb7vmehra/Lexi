@@ -13,6 +13,12 @@ export const sendMessage = async (message: MessageType, conversationId: string):
             message,
             conversationId,
         });
+	console.log(response.data.content)
+        if(response.data.content) {
+            const num_word = response.data.content.trim().split(/\s+/).length;
+            console.log(num_word)
+            await new Promise(resolve => setTimeout(resolve, (num_word / 2.86) * 1000));
+        }
         return response.data;
     } catch (error) {
         throw error;
@@ -35,6 +41,7 @@ export const sendStreamMessage = (
     eventSource.addEventListener('close', (event) => {
         console.log('Server is closing the connection.');
         const message = JSON.parse(event.data);
+	console.log(message, "1")
         onCloseStream(message);
         eventSource.close();
     });
@@ -45,6 +52,7 @@ export const sendStreamMessage = (
         }
 
         const data = JSON.parse(event.data);
+	console.log(data, "2")
 
         if (data.error) {
             if (onError) {

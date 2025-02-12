@@ -38,7 +38,7 @@ const setupServer = () => {
     const app = express();
     app.use(bodyParser.json());
     const corsOptions = {
-        origin: process.env.FRONTEND_URL,
+        origin: "https://lexi.hbssurvey.com",
         credentials: true,
     };
     app.use(cors(corsOptions));

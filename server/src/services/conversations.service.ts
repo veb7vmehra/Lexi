@@ -38,6 +38,9 @@ class ConversationsService {
         if (!streamResponse) {
             const response = await openai.chat.completions.create(chatRequest);
             assistantMessage = response.choices[0].message.content?.trim();
+	    //let num_word = assistantMessage.trim().split(/\s+/).length;
+            //console.log(num_word)
+            //await new Promise(resolve => setTimeout(resolve, (num_word/0.5) * 1000));
         } else {
             const responseStream = await openai.chat.completions.create({ ...chatRequest, stream: true });
             for await (const partialResponse of responseStream) {
@@ -45,6 +48,10 @@ class ConversationsService {
                 await streamResponse(assistantMessagePart);
                 assistantMessage += assistantMessagePart;
             }
+	    //let num_word = assistantMessage.trim().split(/\s+/).length;
+            //console.log(num_word)
+            //await new Promise(resolve => setTimeout(resolve, (num_word/0.5) * 1000));
+	    //console.log("delayed")
         }
 
         const savedMessage = await this.createMessageDoc(

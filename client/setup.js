@@ -26,8 +26,8 @@ const emojis = {
   );
 
   const envContent = `
-    REACT_APP_API_URL="http://localhost:5000"
-    REACT_APP_FRONTEND_URL="http://localhost:3000"
+    REACT_APP_API_URL="https://lexi.hbssurvey.com"
+    REACT_APP_FRONTEND_URL="https://lexi.hbssurvey.com"
   `.trim();
 
   fs.writeFileSync(".env", envContent);
