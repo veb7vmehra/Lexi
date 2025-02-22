@@ -2,6 +2,43 @@ import { MessageType } from '@root/models/AppModels';
 import { ApiPaths } from '../constants';
 import axiosInstance from './AxiosInstance';
 
+function normalRandom(mean: number, stdDev: number): number {
+    // Generate a random number from a standard normal distribution using Box-Muller transform
+    let u = 1 - Math.random(); // Converting [0,1) to (0,1]
+    let v = Math.random();
+    let z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    return mean + stdDev * z; // Scale and shift
+}
+
+function gammaRandom(shape: number, scale: number): number {
+    // Approximate Gamma distribution using Marsaglia and Tsang's method
+    if (shape < 1) {
+        shape += 1;
+    }
+    let d = shape - 1 / 3;
+    let c = 1 / Math.sqrt(9 * d);
+    let x, v;
+    do {
+        let u = Math.random();
+        let n = normalRandom(0, 1);
+        v = Math.pow(1 + c * n, 3);
+        if (v > 0 && Math.log(u) < 0.5 * n * n + d * (1 - v + Math.log(v))) {
+            x = d * v;
+            break;
+        }
+    } while (true);
+    return x * scale;
+}
+
+function getResponseDelay(n_char: number): number {
+    let delay = 1 
+        + normalRandom(0.3, 0.03) * n_char 
+        + gammaRandom(2.5, 0.25);
+        //+ normalRandom(0.03, 0.003) * n_char_prev 
+    
+    return delay; // Time delay in seconds
+}
+
 const serialize = (obj) =>
     Object.keys(obj)
         .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(obj[key])}`)
@@ -18,6 +55,11 @@ export const sendMessage = async (message: MessageType, conversationId: string):
             const num_word = response.data.content.trim().split(/\s+/).length;
             console.log(num_word)
             await new Promise(resolve => setTimeout(resolve, (num_word / response.data.timeDelay) * 1000));
+        }
+        if(response.data.content && response.data.timeDelay == 0) {
+            const num_char = response.data.content.length;
+            const delay = getResponseDelay(num_char)
+            await new Promise(resolve => setTimeout(resolve, delay * 1000));
         }
         return response.data;
     } catch (error) {
