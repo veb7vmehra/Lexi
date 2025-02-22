@@ -274,7 +274,7 @@ const AgentForm: React.FC<AgentFormProps> = ({
             />
             <TextField
                 fullWidth
-                label="Inverse Time Delay"
+                label="Inverse Time Delay (use 0 for advance formula)"
                 name="inverseTimeDelay"
                 value={agent.inverseTimeDelay}
                 onChange={handleChange}
