@@ -14,6 +14,7 @@ import {
     Slider,
     TextField,
     Typography,
+    FormControlLabel,
 } from '@mui/material';
 import React, { useMemo, useState } from 'react';
 import { getExperimentsByAgent } from '../../../../../DAL/server-requests/experiments';
