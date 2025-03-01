@@ -30,11 +30,11 @@ function gammaRandom(shape: number, scale: number): number {
     return x * scale;
 }
 
-function getResponseDelay(n_char: number): number {
+function getResponseDelay(n_char: number, n_char_prev: number): number {
     let delay = 1 
         + normalRandom(0.3, 0.03) * n_char 
-        + gammaRandom(2.5, 0.25);
-        //+ normalRandom(0.03, 0.003) * n_char_prev 
+        + gammaRandom(2.5, 0.25)
+        + normalRandom(0.03, 0.003) * n_char_prev; 
     
     return delay; // Time delay in seconds
 }
@@ -58,7 +58,8 @@ export const sendMessage = async (message: MessageType, conversationId: string):
         }
         if(response.data.content && response.data.timeDelay == 0) {
             const num_char = response.data.content.length;
-            const delay = getResponseDelay(num_char)
+            const prev_num_char = response.data.prev_message.length;
+            const delay = getResponseDelay(num_char, prev_num_char)
             await new Promise(resolve => setTimeout(resolve, delay * 1000));
         }
         return response.data;

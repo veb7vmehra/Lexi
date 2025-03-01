@@ -11,6 +11,7 @@ export interface IConversation {
     messageNumber: number;
     userAnnotation: UserAnnotation;
     timeDelay: number;
+    prev_message: string;
 }
 
 export interface Message {
@@ -19,6 +20,7 @@ export interface Message {
     content: string;
     userAnnotation?: UserAnnotation;
     timeDelay: number;
+    prev_message: string;
 }
 
 export interface IMetadataConversation {

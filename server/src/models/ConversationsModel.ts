@@ -7,6 +7,7 @@ export const conversationSchema = new Schema<IConversation>(
         conversationId: { type: String, required: true },
         content: { type: String, required: true },
         role: { type: String, required: true },
+        prev_message: {type: String, default: null},
         timeDelay: {type: Number, default: null},
         createdAt: { type: Date, default: Date.now },
         timestamp: { type: Number, default: () => Date.now() },

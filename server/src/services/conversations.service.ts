@@ -32,6 +32,9 @@ class ConversationsService {
         const agent = JSON.parse(JSON.stringify(metadataConversation.agent));
         const timeDelay = agent.inverseTimeDelay
 
+        const prev_message = message.content
+        console.log(prev_message)
+
         const messages: any[] = this.getConversationMessages(metadataConversation.agent, conversation, message);
         const chatRequest = this.getChatRequest(metadataConversation.agent, messages);
         await this.createMessageDoc(message, conversationId, conversation.length + 1);
@@ -62,6 +65,7 @@ class ConversationsService {
                 content: assistantMessage,
                 role: 'assistant',
                 timeDelay: timeDelay,
+                prev_message: prev_message,
             },
             conversationId,
             conversation.length + 2,
@@ -108,6 +112,7 @@ class ConversationsService {
             role: 'assistant',
             content: user.isAdmin ? agent.firstChatSentence : user.agent.firstChatSentence,
             timeDelay: null,
+            prev_message: null,
         };
         await Promise.all([
             this.createMessageDoc(firstMessage, res._id.toString(), 1),
@@ -227,9 +232,10 @@ class ConversationsService {
             conversationId,
             messageNumber,
             timeDelay: message.timeDelay,
+            prev_message: message.prev_message
         });
 
-        return { _id: res._id, role: res.role, content: res.content, userAnnotation: res.userAnnotation, timeDelay: res.timeDelay };
+        return { _id: res._id, role: res.role, content: res.content, userAnnotation: res.userAnnotation, timeDelay: res.timeDelay, prev_message: res.prev_message };
     };
 
     private getChatRequest = (agent: IAgent, messages: Message[]) => {
