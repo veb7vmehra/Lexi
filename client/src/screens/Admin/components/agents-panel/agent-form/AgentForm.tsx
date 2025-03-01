@@ -42,6 +42,7 @@ const AgentForm: React.FC<AgentFormProps> = ({
     const [updateUsersAgentMsg, setUpdateUsersAgentMsg] = useState(false);
     const formTitle = useMemo(() => (!isEditMode ? 'New Agent' : 'Edit Agent'), []);
     const [confirmExperimentUpdateMsg, setConfirmExperimentUpdateMsg] = useState(false);
+    const [isHumanDeception, setIsHumanDeception] = useState(false);
 
     const { openSnackbar } = useSnackbar();
     const [slidersEnabled, setSlidersEnabled] = useState<any>(
@@ -78,6 +79,14 @@ const AgentForm: React.FC<AgentFormProps> = ({
     const handleChange = (event) => {
         const { name, value } = event.target;
         setAgent({ ...agent, [name]: value });
+    };
+
+    const handleCheckboxChange = (event) => {
+        const checked = event.target.checked;
+        setIsHumanDeception(checked);
+        if (checked) {
+            setAgent({ ...agent, inverseTimeDelay: 2.8 });
+        }
     };
 
     const handleConfirmUpdate = async () => {
@@ -272,15 +281,32 @@ const AgentForm: React.FC<AgentFormProps> = ({
                 size="small"
                 margin="normal"
             />
-            <TextField
-                fullWidth
-                label="Inverse Time Delay (use 0 for advance formula)"
-                name="inverseTimeDelay"
-                value={agent.inverseTimeDelay}
-                onChange={handleChange}
-                size="small"
-                margin="normal"
-            />
+            <Box>
+                {/* Human Deception Checkbox */}
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={isHumanDeception}
+                            onChange={handleCheckboxChange}
+                            name="humanDeception"
+                        />
+                    }
+                    label="Human Deception"
+                />
+
+                {/* Conditional Rendering of the TextField */}
+                {isHumanDeception && (
+                    <TextField
+                        fullWidth
+                        label="Inverse Time Delay (use 0 for advance formula)"
+                        name="inverseTimeDelay"
+                        value={agent.inverseTimeDelay}
+                        onChange={handleChange}
+                        size="small"
+                        margin="normal"
+                    />
+                )}
+            </Box>
             {renderSlider('temperature', 'temperature', 0, 2, 0.01, slidersEnabled.temperatureEnabled)}
             {renderSlider('maxTokens', 'max tokens', 1, 4096, 1, slidersEnabled.maxTokensEnabled)}
             {renderSlider('topP', 'top p', 0, 1, 0.01, slidersEnabled.topPEnabled)}
