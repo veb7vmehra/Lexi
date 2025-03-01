@@ -16,7 +16,7 @@ import {
     Typography,
     FormControlLabel,
 } from '@mui/material';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { getExperimentsByAgent } from '../../../../../DAL/server-requests/experiments';
 import { updateUsersAgent } from '../../../../../DAL/server-requests/users';
 import { WarningMessage } from '../../../../../components/common/WarningMessasge';
@@ -77,6 +77,10 @@ const AgentForm: React.FC<AgentFormProps> = ({
         return !message;
     };
 
+    useEffect(() => {
+        setIsHumanDeception(agent.inverseTimeDelay !== null);
+    }, [agent.inverseTimeDelay]);
+
     const handleChange = (event) => {
         const { name, value } = event.target;
         setAgent({ ...agent, [name]: value });
@@ -85,9 +89,17 @@ const AgentForm: React.FC<AgentFormProps> = ({
     const handleCheckboxChange = (event) => {
         const checked = event.target.checked;
         setIsHumanDeception(checked);
-        if (checked) {
-            setAgent({ ...agent, inverseTimeDelay: 2.8 });
-        }
+        setAgent((prev) => ({
+            ...prev,
+            inverseTimeDelay: checked ? (prev.inverseTimeDelay ?? 2.8) : null, // Set default value if null, else keep current
+        }));
+    };
+
+    const handleTextFieldChange = (e) => {
+        setAgent((prev) => ({
+            ...prev,
+            inverseTimeDelay: e.target.value, // Update inverseTimeDelay with the new value
+        }));
     };
 
     const handleConfirmUpdate = async () => {
@@ -299,10 +311,10 @@ const AgentForm: React.FC<AgentFormProps> = ({
                 {isHumanDeception && (
                     <TextField
                         fullWidth
-                        label="Inverse Time Delay (use 0 for advance formula)"
+                        label="Inverse Time Delay (use 0 for formula presented in Jones C.R. et al. 2024)"
                         name="inverseTimeDelay"
-                        value={agent.inverseTimeDelay}
-                        onChange={handleChange}
+                        value={agent.inverseTimeDelay ?? ""}
+                        onChange={handleTextFieldChange}
                         size="small"
                         margin="normal"
                     />
