@@ -31,10 +31,9 @@ function gammaRandom(shape: number, scale: number): number {
 }
 
 function getResponseDelay(n_char: number, n_char_prev: number): number {
-    let delay = 1 
-        + normalRandom(0.3, 0.03) * n_char 
+    let delay = (normalRandom(0.3, 0.03) * n_char 
         + gammaRandom(2.5, 0.25)
-        + normalRandom(0.03, 0.003) * n_char_prev; 
+        + normalRandom(0.03, 0.003) * n_char_prev); 
     
     return delay; // Time delay in seconds
 }

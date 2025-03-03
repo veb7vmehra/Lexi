@@ -91,7 +91,7 @@ const AgentForm: React.FC<AgentFormProps> = ({
         setIsHumanDeception(checked);
         setAgent((prev) => ({
             ...prev,
-            inverseTimeDelay: checked ? (prev.inverseTimeDelay ?? 2.8) : null, // Set default value if null, else keep current
+            inverseTimeDelay: checked ? (prev.inverseTimeDelay ?? 2.86) : null, // Set default value if null, else keep current
         }));
     };
 
